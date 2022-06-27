@@ -65,7 +65,6 @@ describe("Message Service app end-to-end ", () => {
         const deleteResponse: AxiosResponse = await messageService.delete(`/messages/${getResponse.data.id}`);
 
         expect(deleteResponse.status).toBe(204);
-        expect(deleteResponse.data).toEqual("");
 
         // Verify the message was deleted
         try {
@@ -123,7 +122,6 @@ describe("Message Service app end-to-end ", () => {
         const deleteResponse: AxiosResponse = await messageService.delete("/messages");
 
         expect(deleteResponse.status).toBe(204);
-        expect(deleteResponse.data).toEqual("");
 
         // Verify all messages were deleted
         const listDeletedResponse: AxiosResponse = await messageService.get("/messages");
