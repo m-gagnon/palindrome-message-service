@@ -137,6 +137,7 @@ describe("Message Service app end-to-end ", () => {
     it("should receive appropriate error response and status when specifying a message ID that does not exist", async () => {
         try {
             await messageService.get("/messages/fake-message-id");
+            fail();
         } catch (e: any) {
             expect(e.response.status).toBe(404);
             expect(e.response.data).toEqual({
@@ -148,15 +149,7 @@ describe("Message Service app end-to-end ", () => {
             await messageService.patch("/messages/fake-message-id", {
                 message: "new-message"
             });
-        } catch (e: any) {
-            expect(e.response.status).toBe(404);
-            expect(e.response.data).toEqual({
-                error: "No message with ID fake-message-id was found."
-            });
-        }
-
-        try {
-            await messageService.delete("/messages/fake-message-id");
+            fail();
         } catch (e: any) {
             expect(e.response.status).toBe(404);
             expect(e.response.data).toEqual({
@@ -170,6 +163,7 @@ describe("Message Service app end-to-end ", () => {
             await messageService.post("/messages", {
                 message: null
             });
+            fail();
         } catch (e: any) {
             expect(e.response.status).toBe(400);
             expect(e.response.data).toEqual({
@@ -181,6 +175,7 @@ describe("Message Service app end-to-end ", () => {
             await messageService.patch("/messages/messageId", {
                 message: null
             });
+            fail();
         } catch (e: any) {
             expect(e.response.status).toBe(400);
             expect(e.response.data).toEqual({
