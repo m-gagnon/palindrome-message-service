@@ -1,0 +1,195 @@
+swagger: "2.0"
+info:
+  description: "Simple RESTful service for managing messages which may or may not be palindromes."
+  version: "1.0.0"
+  title: "Message Service"
+  contact:
+    email: "marc.gagnon178@gmail.com"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+tags:
+- name: "Messages"
+  description: "Manage Messages"
+schemes:
+- "http"
+paths:
+  /messages:
+    get: 
+      tags:
+      - "Messages"
+      summary: "List all saved messages"
+      description: "List all saved messages"
+      operationId: "listMessages"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Messages are listed successfully"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        "500":
+          description: "An unexpected server error"
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+      - "Messages"
+      summary: "Save a message"
+      description: "Save a message"
+      operationId: "saveMessage"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Message to save"
+        required: true
+        schema:
+          $ref: "#/definitions/MessageContent"
+      responses:
+        "201":
+          description: "Message was saved successfully"
+          schema:
+            $ref: "#/definitions/Message"
+        "400":
+          description: "No message to save was specified"
+          schema:
+            $ref: "#/definitions/Error"
+        "500":
+          description: "An unexpected server error"
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+      - "Messages"
+      summary: "Delete all saved messages"
+      description: "Delete all saved messages"
+      operationId: "deleteAllMessages"
+      produces:
+      - "application/json"
+      responses:
+        "204":
+          description: "Messages were deleted successfully"
+        "500":
+          description: "An unexpected server error"
+          schema:
+            $ref: "#/definitions/Error"
+  /messages/{messageId}:
+    get:
+      tags:
+      - "Messages"
+      summary: "Get a message by ID"
+      description: "Get a message by ID"
+      operationId: "getMessageById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "messageId"
+        in: "path"
+        description: "Message ID to get"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        "200":
+          description: "Message was found successfully"
+          schema:
+            $ref: "#/definitions/Message"
+        "404":
+          description: "Message with the given ID was not found"
+          schema:
+            $ref: "#/definitions/Error"
+        "500":
+          description: "An unexpected server error"
+          schema:
+            $ref: "#/definitions/Error"
+    patch:
+      tags:
+      - "Messages"
+      summary: "Update a message"
+      description: "Update a message"
+      operationId: "updateMessage"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "messageId"
+        in: "path"
+        description: "Message ID to update"
+        required: true
+        type: "string"
+        format: "uuid"
+      - in: "body"
+        name: "body"
+        description: "Message content to update"
+        required: true
+        schema:
+          $ref: "#/definitions/MessageContent"
+      responses:
+        "200":
+          description: "Message was updated successfully"
+          schema:
+            $ref: "#/definitions/Message"
+        "400":
+          description: "No message content to update was specified"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Message with the given ID was not found"
+          schema:
+            $ref: "#/definitions/Error"
+        "500":
+          description: "An unexpected server error"
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+      - "Messages"
+      summary: "Delete a message"
+      description: "Delete a message"
+      operationId: "deleteMessage"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "messageId"
+        in: "path"
+        description: "Message ID to delete"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        "204":
+          description: "Message was deleted successfully"
+        "500":
+          description: "An unexpected server error"
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  MessageContent:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        example: "Not a palindrome!"
+  Message:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+      message:
+        type: "string"
+        example: "Not a palindrome!"
+      isPalindrome:
+        type: "boolean"
+        example: false
+  Error:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+        example: "Error description"

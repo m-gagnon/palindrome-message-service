@@ -1,6 +1,6 @@
 {
     "env": {
-        "browser": true,
+        "browser": false,
         "es2021": true
     },
     "extends": [
@@ -15,5 +15,17 @@
         "@typescript-eslint"
     ],
     "rules": {
+      "node/no-missing-import": "off",
+      "node/no-unsupported-features/es-syntax": [
+        "error",
+        {
+          "ignores": ["modules"]
+        }
+      ],
+      "new-cap": "off",
+      "no-undef": "off",
+      "no-console": "off",
+      "jsdoc/require-description": "off",
+      "jsdoc/require-returns": "off"
     }
 }
