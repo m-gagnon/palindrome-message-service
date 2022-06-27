@@ -34,4 +34,4 @@ To run the tests, ensure the container is running and the .env values are correc
 npm run test
 ```
 
-![alt text](./test_run.jpg)
+![alt text](./Test_Run.jpg)
