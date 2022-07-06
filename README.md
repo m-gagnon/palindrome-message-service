@@ -1,6 +1,6 @@
-# Message Service
+# Palindrome Message Service
 
-The message service is a RESTful microservice implemented to store and retrieve messages which may or may not be palindromes.
+The palindrome message service is a RESTful microservice implemented to store and retrieve messages which may or may not be palindromes.
 
 ## Technology and Architecture
 
