@@ -69,23 +69,6 @@ describe("MessageService ", () => {
             expect(findSpy).toHaveBeenCalledTimes(1);
             expect(findSpy).toHaveBeenCalledWith();
         });
-
-        it("should return a 500 if an unexpected error occurs", async () => {
-            const findSpy = jest.spyOn(mockMessageRepository, "find").mockImplementationOnce(() => {
-                throw new Error("An unexpected error");
-            });
-
-            await messageService.findAllMessages(mockResponse);
-
-            expect(mockResponse.status).toHaveBeenCalledTimes(1);
-            expect(mockResponse.status).toHaveBeenCalledWith(500);
-            expect(mockSend).toHaveBeenCalledTimes(1);
-            expect(mockSend).toHaveBeenCalledWith({
-                error: "An unexpected error occurred."
-            });
-            expect(findSpy).toHaveBeenCalledTimes(1);
-            expect(findSpy).toHaveBeenCalledWith();
-        });
     });
 
     describe("get message by ID ", () => {
@@ -128,27 +111,6 @@ describe("MessageService ", () => {
             expect(mockSend).toHaveBeenCalledTimes(1);
             expect(mockSend).toHaveBeenCalledWith({
                 error: "No message with ID message-id-1 was found."
-            });
-            expect(findOneSpy).toHaveBeenCalledTimes(1);
-            expect(findOneSpy).toHaveBeenCalledWith({
-                where: {
-                    id: "message-id-1"
-                }
-            });
-        });
-
-        it("should return a 500 if an unexpected error occurs", async () => {
-            const findOneSpy = jest.spyOn(mockMessageRepository, "findOne").mockImplementationOnce(() => {
-                throw new Error("An unexpected error");
-            });
-
-            await messageService.getMessageById(mockRequest, mockResponse);
-
-            expect(mockResponse.status).toHaveBeenCalledTimes(1);
-            expect(mockResponse.status).toHaveBeenCalledWith(500);
-            expect(mockSend).toHaveBeenCalledTimes(1);
-            expect(mockSend).toHaveBeenCalledWith({
-                error: "An unexpected error occurred."
             });
             expect(findOneSpy).toHaveBeenCalledTimes(1);
             expect(findOneSpy).toHaveBeenCalledWith({
@@ -204,24 +166,22 @@ describe("MessageService ", () => {
             expect(saveSpy).toHaveBeenCalledTimes(0);
         });
 
-        it("should return a 500 if an unexpected error occurs", async () => {
-            const saveSpy = jest.spyOn(mockMessageRepository, "save").mockImplementationOnce(() => {
-                throw new Error("An unexpected error");
-            });
+        it("should return a 400 if a non-string message was provided", async () => {
+            const saveSpy = jest.spyOn(mockMessageRepository, "save");
 
-            await messageService.saveMessage(mockRequest, mockResponse);
+            await messageService.saveMessage({
+                body: {
+                    message: 584
+                }
+            } as unknown as express.Request, mockResponse);
 
             expect(mockResponse.status).toHaveBeenCalledTimes(1);
-            expect(mockResponse.status).toHaveBeenCalledWith(500);
+            expect(mockResponse.status).toHaveBeenCalledWith(400);
             expect(mockSend).toHaveBeenCalledTimes(1);
             expect(mockSend).toHaveBeenCalledWith({
-                error: "An unexpected error occurred."
+                error: "Message specified is not of type string."
             });
-            expect(saveSpy).toHaveBeenCalledTimes(1);
-            expect(saveSpy).toHaveBeenCalledWith({
-                message: "Not a palindrome!",
-                isPalindrome: false
-            } as MessageEntity);
+            expect(saveSpy).toHaveBeenCalledTimes(0);
         });
     });
 
@@ -292,6 +252,29 @@ describe("MessageService ", () => {
             expect(updateSpy).toHaveBeenCalledTimes(0);
         });
 
+        it("should return a 400 if a non-string message was provided", async () => {
+            const findOneSpy = jest.spyOn(mockMessageRepository, "findOne");
+            const updateSpy = jest.spyOn(mockMessageRepository, "update");
+
+            await messageService.updateMessage({
+                params: {
+                    messageId: "message-id-1"
+                },
+                body: {
+                    message: 659
+                }
+            } as unknown as express.Request, mockResponse);
+
+            expect(mockResponse.status).toHaveBeenCalledTimes(1);
+            expect(mockResponse.status).toHaveBeenCalledWith(400);
+            expect(mockSend).toHaveBeenCalledTimes(1);
+            expect(mockSend).toHaveBeenCalledWith({
+                error: "Message specified is not of type string."
+            });
+            expect(findOneSpy).toHaveBeenCalledTimes(0);
+            expect(updateSpy).toHaveBeenCalledTimes(0);
+        });
+
         it("should return a 404 if no message was found", async () => {
             const findOneSpy = jest.spyOn(mockMessageRepository, "findOne").mockResolvedValueOnce(null);
             const updateSpy = jest.spyOn(mockMessageRepository, "update");
@@ -303,29 +286,6 @@ describe("MessageService ", () => {
             expect(mockSend).toHaveBeenCalledTimes(1);
             expect(mockSend).toHaveBeenCalledWith({
                 error: "No message with ID message-id-1 was found."
-            });
-            expect(findOneSpy).toHaveBeenCalledTimes(1);
-            expect(findOneSpy).toHaveBeenCalledWith({
-                where: {
-                    id: "message-id-1"
-                }
-            });
-            expect(updateSpy).toHaveBeenCalledTimes(0);
-        });
-
-        it("should return a 500 if an unexpected error occurs", async () => {
-            const findOneSpy = jest.spyOn(mockMessageRepository, "findOne").mockImplementationOnce(() => {
-                throw new Error("An unexpected error");
-            });
-            const updateSpy = jest.spyOn(mockMessageRepository, "update");
-
-            await messageService.updateMessage(mockRequest, mockResponse);
-
-            expect(mockResponse.status).toHaveBeenCalledTimes(1);
-            expect(mockResponse.status).toHaveBeenCalledWith(500);
-            expect(mockSend).toHaveBeenCalledTimes(1);
-            expect(mockSend).toHaveBeenCalledWith({
-                error: "An unexpected error occurred."
             });
             expect(findOneSpy).toHaveBeenCalledTimes(1);
             expect(findOneSpy).toHaveBeenCalledWith({
@@ -355,23 +315,6 @@ describe("MessageService ", () => {
             expect(deleteSpy).toHaveBeenCalledTimes(1);
             expect(deleteSpy).toHaveBeenCalledWith("message-id-1");
         });
-
-        it("should return a 500 if an unexpected error occurs", async () => {
-            const deleteSpy = jest.spyOn(mockMessageRepository, "delete").mockImplementationOnce(() => {
-                throw new Error("An unexpected error");
-            });
-
-            await messageService.deleteMessage(mockRequest, mockResponse);
-
-            expect(mockResponse.status).toHaveBeenCalledTimes(1);
-            expect(mockResponse.status).toHaveBeenCalledWith(500);
-            expect(mockSend).toHaveBeenCalledTimes(1);
-            expect(mockSend).toHaveBeenCalledWith({
-                error: "An unexpected error occurred."
-            });
-            expect(deleteSpy).toHaveBeenCalledTimes(1);
-            expect(deleteSpy).toHaveBeenCalledWith("message-id-1");
-        });
     });
 
     describe("delete all messages ", () => {
@@ -383,23 +326,6 @@ describe("MessageService ", () => {
             expect(mockResponse.status).toHaveBeenCalledTimes(1);
             expect(mockResponse.status).toHaveBeenCalledWith(204);
             expect(mockSend).toHaveBeenCalledTimes(1);
-            expect(clearSpy).toHaveBeenCalledTimes(1);
-            expect(clearSpy).toHaveBeenCalledWith();
-        });
-
-        it("should return a 500 if an unexpected error occurs", async () => {
-            const clearSpy = jest.spyOn(mockMessageRepository, "clear").mockImplementationOnce(() => {
-                throw new Error("An unexpected error");
-            });
-
-            await messageService.deleteAllMessages(mockResponse);
-
-            expect(mockResponse.status).toHaveBeenCalledTimes(1);
-            expect(mockResponse.status).toHaveBeenCalledWith(500);
-            expect(mockSend).toHaveBeenCalledTimes(1);
-            expect(mockSend).toHaveBeenCalledWith({
-                error: "An unexpected error occurred."
-            });
             expect(clearSpy).toHaveBeenCalledTimes(1);
             expect(clearSpy).toHaveBeenCalledWith();
         });

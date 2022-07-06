@@ -20,136 +20,106 @@ export class MessageService {
     }
 
     async findAllMessages(res: express.Response) {
-        try {
-            const messages = await this.messageRepository.find();
+        const messages = await this.messageRepository.find();
 
-            res.status(200).send({
-                messages
-            });
-        } catch (e) {
-            console.log(`An unexpected error occurred: ${JSON.stringify(e)}`);
-            res.status(500).send({
-                error: "An unexpected error occurred."
-            });
-        }
+        res.status(200).send({
+            messages
+        });
     }
 
     async getMessageById(req: express.Request, res: express.Response) {
-        try {
-            const messageId: string = req.params.messageId;
+        const messageId: string = req.params.messageId;
 
-            const messageEntity: MessageEntity | null = await this.messageRepository.findOne({
-                where: {
-                    id: req.params.messageId
-                }
-            });
-
-            if (!messageEntity) {
-                res.status(404).send({
-                    error: `No message with ID ${messageId} was found.`
-                });
-                return;
+        const messageEntity: MessageEntity | null = await this.messageRepository.findOne({
+            where: {
+                id: req.params.messageId
             }
+        });
 
-            res.status(200).send(messageEntity);
-        } catch (e) {
-            console.log(`An unexpected error occurred: ${JSON.stringify(e)}`);
-            res.status(500).send({
-                error: "An unexpected error occurred."
+        if (!messageEntity) {
+            res.status(404).send({
+                error: `No message with ID ${messageId} was found.`
             });
+            return;
         }
+
+        res.status(200).send(messageEntity);
     }
 
     async saveMessage(req: express.Request, res: express.Response) {
-        try {
-            const message: string = req.body.message;
+        const message: string = req.body.message;
 
-            if (!message) {
-                res.status(400).send({
-                    error: "Invalid request body. No message specified."
-                });
-                return;
-            }
-
-            const messageEntity: MessageEntity = new MessageEntity();
-
-            messageEntity.message = message;
-            messageEntity.isPalindrome = isPalindrome(message, false);
-
-            const savedMessage: MessageEntity = await this.messageRepository.save(messageEntity);
-
-            res.status(201).send(savedMessage);
-        } catch (e) {
-            console.log(`An unexpected error occurred: ${JSON.stringify(e)}`);
-            res.status(500).send({
-                error: "An unexpected error occurred."
+        if (!message) {
+            res.status(400).send({
+                error: "Invalid request body. No message specified."
             });
+            return;
         }
+        if (typeof message !== "string") {
+            res.status(400).send({
+                error: "Message specified is not of type string."
+            });
+            return;
+        }
+
+        const messageEntity: MessageEntity = new MessageEntity();
+
+        messageEntity.message = message;
+        messageEntity.isPalindrome = isPalindrome(message, false);
+
+        const savedMessage: MessageEntity = await this.messageRepository.save(messageEntity);
+
+        res.status(201).send(savedMessage);
     }
 
     async updateMessage(req: express.Request, res: express.Response) {
-        try {
-            const messageId: string = req.params.messageId;
-            const newMessage: string = req.body.message;
+        const messageId: string = req.params.messageId;
+        const newMessage: string = req.body.message;
 
-            if (!newMessage) {
-                res.status(400).send({
-                    error: "Invalid request body. No message specified."
-                });
-                return;
-            }
-
-            const savedMessage: MessageEntity | null = await this.messageRepository.findOne({
-                where: {
-                    id: messageId
-                }
+        if (!newMessage) {
+            res.status(400).send({
+                error: "Invalid request body. No message specified."
             });
-
-            if (!savedMessage) {
-                res.status(404).send({
-                    error: `No message with ID ${messageId} was found.`
-                });
-                return;
-            }
-
-            savedMessage.message = newMessage;
-            savedMessage.isPalindrome = isPalindrome(newMessage, false);
-
-            await this.messageRepository.update(messageId, savedMessage);
-
-            res.status(200).send(savedMessage);
-        } catch (e) {
-            console.log(`An unexpected error occurred: ${JSON.stringify(e)}`);
-            res.status(500).send({
-                error: "An unexpected error occurred."
-            });
+            return;
         }
+        if (typeof newMessage !== "string") {
+            res.status(400).send({
+                error: "Message specified is not of type string."
+            });
+            return;
+        }
+
+        const savedMessage: MessageEntity | null = await this.messageRepository.findOne({
+            where: {
+                id: messageId
+            }
+        });
+
+        if (!savedMessage) {
+            res.status(404).send({
+                error: `No message with ID ${messageId} was found.`
+            });
+            return;
+        }
+
+        savedMessage.message = newMessage;
+        savedMessage.isPalindrome = isPalindrome(newMessage, false);
+
+        await this.messageRepository.update(messageId, savedMessage);
+
+        res.status(200).send(savedMessage);
     }
 
     async deleteMessage(req: express.Request, res: express.Response) {
-        try {
-            const messageId: string = req.params.messageId;
+        const messageId: string = req.params.messageId;
 
-            await this.messageRepository.delete(messageId);
+        await this.messageRepository.delete(messageId);
 
-            res.status(204).send();
-        } catch (e) {
-            console.log(`An unexpected error occurred: ${JSON.stringify(e)}`);
-            res.status(500).send({
-                error: "An unexpected error occurred."
-            });
-        }
+        res.status(204).send();
     }
 
     async deleteAllMessages(res: express.Response) {
-        try {
-            await this.messageRepository.clear();
-            res.status(204).send();
-        } catch (e) {
-            console.log(`An unexpected error occurred: ${JSON.stringify(e)}`);
-            res.status(500).send({
-                error: "An unexpected error occurred."
-            });
-        }
+        await this.messageRepository.clear();
+        res.status(204).send();
     }
 }

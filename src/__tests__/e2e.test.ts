@@ -158,9 +158,7 @@ describe("Message Service app end-to-end ", () => {
 
     it("should receive appropriate error response and status when not specifying a message body", async () => {
         try {
-            await messageService.post("/messages", {
-                message: null
-            });
+            await messageService.post("/messages", {});
             fail();
         } catch (e: any) {
             expect(e.response.status).toBe(400);
@@ -170,14 +168,38 @@ describe("Message Service app end-to-end ", () => {
         }
 
         try {
-            await messageService.patch("/messages/messageId", {
-                message: null
-            });
+            await messageService.patch("/messages/messageId", {});
             fail();
         } catch (e: any) {
             expect(e.response.status).toBe(400);
             expect(e.response.data).toEqual({
                 error: "Invalid request body. No message specified."
+            });
+        }
+    });
+
+    it("should receive appropriate error response and status when specifying wrong message type", async () => {
+        try {
+            await messageService.post("/messages", {
+                message: 538
+            });
+            fail();
+        } catch (e: any) {
+            expect(e.response.status).toBe(400);
+            expect(e.response.data).toEqual({
+                error: "Message specified is not of type string."
+            });
+        }
+
+        try {
+            await messageService.patch("/messages/messageId", {
+                message: 482
+            });
+            fail();
+        } catch (e: any) {
+            expect(e.response.status).toBe(400);
+            expect(e.response.data).toEqual({
+                error: "Message specified is not of type string."
             });
         }
     });
